@@ -10,7 +10,7 @@
        upgrade=yes
   when: new_version|changed
   
-- name: install necessary packages
+- name: install necessary packages for build
   apt: >
     name={{ item }}
   with_items:
@@ -27,18 +27,93 @@
     dest=/root/mediagoblin/
     version=debian/unstable
     recursive=no
+  register: repo_pull
 
 - name: build package
   # Run git-buildpackage, but don't sign the package or changes file
   command: git-buildpackage --git-builder='debuild -i -I -us -uc'
   args:
     chdir: /root/mediagoblin/
+  when: repo_pull | changed
 
-
-- name: Install generated .deb file
+- name: Install generated .deb file and dependencies
   apt: >
     deb=/root/build-area/mediagoblin_0.7.1+dfsg1-1_all.deb
     force=yes
   # Ignore errors due to a bug in the apt module.
   # TODO: check if this is fixed in Ansible 0.8
   failed_when: False
+
+- name: install necessary packages testing mediagoblin
+  apt: >
+    name={{ item }}
+  with_items:
+  - postgresql
+  - postgresql-client
+  - python-psycopg2
+  - nginx
+  tags:
+    mg-install-packages-for-testing
+
+- name: Create postgres mediagoblin user
+  postgresql_user: >
+    name=mediagoblin
+  su: yes
+  su_user: postgres
+  tags:
+    - create-mg-db-user
+
+- name: Create mediagoblin postgres databes
+  postgresql_db: >
+    name=mediagoblin
+    owner=mediagoblin
+    encoding=UNICODE
+    template=template0
+  su: yes
+  su_user: postgres
+  tags:
+    - create-mg-db
+
+- name: add mediagoblin system user
+  user: >
+    name=mediagoblin
+    system=yes
+  tags:
+    - create-mg-system-user
+
+- name: make mediagoblin storage directories owned by mediagoblin
+  file: >
+    path={{ item }}
+    owner=mediagoblin
+    group=mediagoblin
+    recurse=yes
+  with_items:
+    - /var/lib/mediagoblin/
+    - /var/spool/mediagoblin
+  tags:
+    - mg-storage-dirs
+
+- name: update mediagoblin database
+  su: yes
+  su_user: mediagoblin
+  command:
+    /usr/bin/gmg -cf /etc/mediagoblin/default/mediagoblin.ini dbupdate
+  tags:
+    - mg-gmg-dbupdate
+
+- name: add nginx config file
+  template:
+    src=nginx.conf
+    dest=/etc/nginx/sites-available/mediagoblin.conf
+  tags:
+    - mg-nginx-config
+  notify:
+    - reload nginx
+
+- name: link nginx config file
+  file:
+    path=/etc/nginx/sites-enabled/mediagoblin.conf
+    src=/etc/nginx/sites-available/mediagoblin.conf
+    state=link
+  tags:
+    - mg-nginx-config

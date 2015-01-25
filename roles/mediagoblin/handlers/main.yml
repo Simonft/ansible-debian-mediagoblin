@@ -1,3 +1,5 @@
 ---
-- name: update cache
-  apt: update_cache=yes
+- name: reload nginx
+  service: >
+    name=nginx
+    state=reloaded
