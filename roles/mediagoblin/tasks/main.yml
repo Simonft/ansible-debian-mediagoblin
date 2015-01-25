@@ -1,0 +1,44 @@
+---
+- name: set version of debian to use
+  template: >
+    src=sources.list
+    dest=/etc/apt/sources.list
+  register: new_version
+
+- name: update cache and upgrade
+  apt: update_cache=yes
+       upgrade=yes
+  when: new_version|changed
+  
+- name: install necessary packages
+  apt: >
+    name={{ item }}
+  with_items:
+  - git
+  - git-buildpackage
+  - python
+  - python-setuptools
+  - python-sphinx
+  - dh-python
+
+- name: get mediagoblin package source
+  git: >
+    repo=https://anonscm.debian.org/git/collab-maint/mediagoblin.git
+    dest=/root/mediagoblin/
+    version=debian/unstable
+    recursive=no
+
+- name: build package
+  # Run git-buildpackage, but don't sign the package or changes file
+  command: git-buildpackage --git-builder='debuild -i -I -us -uc'
+  args:
+    chdir: /root/mediagoblin/
+
+
+- name: Install generated .deb file
+  apt: >
+    deb=/root/build-area/mediagoblin_0.7.1+dfsg1-1_all.deb
+    force=yes
+  # Ignore errors due to a bug in the apt module.
+  # TODO: check if this is fixed in Ansible 0.8
+  failed_when: False

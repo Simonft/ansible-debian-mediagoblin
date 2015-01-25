@@ -1,0 +1,13 @@
+  /home/simonft/ansible:
+  total used in directory 68 available 325236
+  drwxr-xr-x   2 simonft simonft  4096 Jan 25 14:59 .
+  drwxr-xr-x 247 simonft simonft 36864 Jan 25 14:56 ..
+  drwxr-xr-x   2 simonft simonft  4096 Jan 25 15:01 roles
+  -rw-r--r--   1 simonft simonft    18 Jan 25 14:59 ansible.cfg
+  -rw-r--r--   1 simonft simonft     8 Jan 25 14:59 config~
+  -rw-r--r--   1 simonft simonft    33 Jan 25 12:42 hosts
+  lrwxrwxrwx   1 simonft simonft    31 Jan 25 14:54 .#hosts -> simonft@goldman.2131:1422199576
+  -rw-r--r--   1 simonft simonft    34 Jan 25 14:55 #hosts#
+  -rw-r--r--   1 simonft simonft    52 Jan 25 12:39 hosts~
+  lrwxrwxrwx   1 simonft simonft    31 Jan 25 14:59 .#site.yml -> simonft@goldman.2131:1422199576
+  -rw-r--r--   1 simonft simonft     9 Jan 25 14:56 site.yml
