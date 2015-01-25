@@ -1,0 +1,2 @@
+To use, add a hosts file and run:
+ansible-playbook site.yml -i hosts -u <remote username>
