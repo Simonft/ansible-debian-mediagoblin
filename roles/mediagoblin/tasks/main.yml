@@ -53,7 +53,7 @@
   - python-psycopg2
   - nginx
   tags:
-    mg-install-packages-for-testing
+  - mg-install-packages-for-testing
 
 - name: Create postgres mediagoblin user
   postgresql_user: >
