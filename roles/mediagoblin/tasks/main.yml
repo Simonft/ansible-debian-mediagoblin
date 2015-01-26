@@ -120,3 +120,9 @@
   tags:
     - mg-nginx-config
 
+- name: Run mediagoblin
+  shell: /usr/bin/paster serve /etc/mediagoblin/default/paste.ini --server-name=fcgi fcgi_host=127.0.0.1 fcgi_port=26543 &
+  su: yes
+  su_user: mediagoblin
+  tags:
+    - mg-run
