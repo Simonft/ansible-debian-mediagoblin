@@ -36,13 +36,14 @@
     chdir: /root/mediagoblin/
   when: repo_pull | changed
 
-- name: Install generated .deb file and dependencies
+- name: Install generated .deb file
   apt: >
     deb=/root/build-area/mediagoblin_0.7.1+dfsg1-1_all.deb
-    force=yes
-  # Ignore errors due to a bug in the apt module.
-  # TODO: check if this is fixed in Ansible 0.8
-  failed_when: False
+
+# The previous command will leave the 
+- name: Install dependencies of mediagoblin
+  command:
+    apt install -f
 
 - name: install necessary packages testing mediagoblin
   apt: >
@@ -86,6 +87,7 @@
     path={{ item }}
     owner=mediagoblin
     group=mediagoblin
+    state=directory
     recurse=yes
   with_items:
     - /var/lib/mediagoblin/
@@ -117,3 +119,4 @@
     state=link
   tags:
     - mg-nginx-config
+
