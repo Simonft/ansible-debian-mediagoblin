@@ -132,6 +132,8 @@
 
 - name: Run mediagoblin
   shell: '/usr/bin/paster serve /etc/mediagoblin/default/paste.ini --server-name=fcgi fcgi_host=127.0.0.1 fcgi_port=26543 2>&1 | tee /var/log/mediagoblin/mg.log &'
+  environment:
+    CELERY_ALWAYS_EAGER: true
   args:
     executable: /bin/bash
   su: yes
